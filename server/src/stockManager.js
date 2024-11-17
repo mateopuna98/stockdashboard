@@ -22,42 +22,39 @@ class StockManager {
                 {symbol: 'AMZN', name: 'Amazon.com Inc.', price: 178.45, change: 12.79, percentChange: 7.26},
                 {symbol: 'GOOGL', name: 'Alphabet Inc.', price: 144.73, change: -5.70, percentChange: -3.43}
             ]
-        };
-    }
 
+        };
+        this.changeFactor = 0.1;
+    }
 
     getPercentageChange(stockType) {
 
         if (stockType === "gainers") {
-            return (Math.random()) * 2
+            return (Math.random()) * this.changeFactor;
         } else if (stockType === "losers") {
-            return -1 * (Math.random()) * 2
+            return (Math.random()) * (-this.changeFactor);
         } else {
-            return (Math.random() + 0.5) * 2
+            return (Math.random() - 0.5) * this.changeFactor
         }
     }
     updatePrices() {
         const updatedStocks = {};
 
-        const keys  = Object.keys(this.stocks);
-        console.log(keys)
-
         Object.keys(this.stocks).forEach((key) => {
             updatedStocks[key] = this.stocks[key]
                 .map((stock) => {
-                const percentageChange = this.getPercentageChange(key) / 100;
+                const percentChange = this.getPercentageChange(key);
+                const newPrice = stock.price + stock.price * (percentChange/100);
                 return {
                     ...stock,
-                    oldPrice: stock.price,
-                    price: stock.price * (1 + percentageChange),
-                    percentageChange: percentageChange,
-                    change: stock.price * percentageChange
+                    price: newPrice,
+                    percentChange: percentChange,
+                    change: newPrice - stock.price
                 };
             });
         });
 
         this.stocks = updatedStocks;
-
 
         return updatedStocks;
     };

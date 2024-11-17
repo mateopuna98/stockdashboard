@@ -1,4 +1,4 @@
-import {useEffect, useState, useCallback} from "react";
+import {useEffect, useState, useRef, useCallback} from "react";
 
 function Header () {
         return (
@@ -52,15 +52,9 @@ function StockList ({stocks, title}) {
             color: 'red',
             fontSize: '14px',
             textAlign: 'right',
-        },
-        graph: {
-            width: '80px',
-            height: '30px',
         }
     };
-    console.log("STOCKS")
-    console.log(stocks);
-    console.log(title);
+
     return (
         <div className="stock-list" style={styles.container}>
             <div style={styles.header}>{title}</div>
@@ -140,44 +134,81 @@ function Dashboard () {
     });
     const [loading, setLoading] = useState(true);
 
+    const wsRef = useRef(null);
+    const reconnectTimeoutRef = useRef(null);
+    const WEBSOCKET_SERVER = "ws://localhost:3001";
+
+
     const connectWebSocket = useCallback(() => {
-        const ws = new WebSocket('ws://localhost:3001');
+
+        if (wsRef.current) {
+            return;
+        }
+
+
+        console.log("Running connectWebSocket");
+        const ws = new WebSocket(WEBSOCKET_SERVER);
+        wsRef.current = ws;
 
         ws.onopen = () => {
             console.log('Connected to WebSocket');
         };
 
+        ws.onerror = (error) => {
+            console.error("WebSocket error", error);
+        }
+
         ws.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                setStockData(prevData => {
+                    if (!prevData.trending.length) {
+                        setLoading(false);
+                        return data;
+                    }
+                    return {
+                        trending: data.trending || [],
+                        gainers: data.gainers || [],
+                        losers: data.losers || []
+                    };
+                });
+            } catch (err) {
+                console.error("Error parsing WebSocket data:", err);
+            }
 
-            const data = JSON.parse(event.data);
-            setStockData(prevData => {
-                if (!prevData.trending.length) {
-                    setLoading(false);
-                    return data;
-                }
-
-                return {
-                    trending: data.trending || [],
-                    gainers: data.gainers || [],
-                    losers: data.losers || []
-                };
-            });
         };
 
         ws.onclose = () => {
             console.log('WebSocket disconnected');
-            setTimeout(connectWebSocket, 3000);
+            wsRef.current = null;
+            if (reconnectTimeoutRef.current) {
+                clearTimeout(reconnectTimeoutRef.current);
+                reconnectTimeoutRef.current = null
+            }
         };
 
         return () => {
-            ws.close();
+
         };
     }, []);
 
     useEffect(() => {
+        console.log("Dashboard mounted, connecting WebSocket...");
         const cleanup = connectWebSocket();
-        return cleanup;
-    }, [connectWebSocket]);
+        return () => {
+            console.log("Dashboard unmounting, cleaning up...");
+            cleanup();
+            if (reconnectTimeoutRef.current) {
+                clearTimeout(reconnectTimeoutRef.current);
+                reconnectTimeoutRef.current = null
+            }
+            if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+                console.log('Closing WebSocket connection due to app teardown...');
+                wsRef.current.close();
+                wsRef.current = null;
+            }
+        };
+    },[connectWebSocket]);
 
     if (loading) {
         return <div className="loading">Loading...</div>;
