@@ -21,7 +21,8 @@ class StockManager {
                 {symbol: 'MSFT', name: 'Microsoft Corp.', price: 425.65, change: -18.31, percentChange: -2.40},
                 {symbol: 'AMZN', name: 'Amazon.com Inc.', price: 178.45, change: 12.79, percentChange: 7.26},
                 {symbol: 'GOOGL', name: 'Alphabet Inc.', price: 144.73, change: -5.70, percentChange: -3.43}
-            ]
+            ],
+            watchlist: []
 
         };
         this.changeFactor = 0.1;
@@ -58,6 +59,16 @@ class StockManager {
 
         return updatedStocks;
     };
+
+
+    // getWatchlist() {
+    //     //Query PostgreSQL to find the watchlist for the user
+    //
+    // }
+    // getStocks() {
+    //     this.stocks.watchlist = this.getWatchlist();
+    //     return this.updatePrices();
+    // }
 }
 
 module.exports = StockManager;

@@ -1,6 +1,7 @@
 const express = require("express"),
     http = require("http"),
     ws = require("ws"),
+    {initializePostgres} = require("./db/initializePostgres");
     StockManager = require("./stockManager");
 
 const app = express();
@@ -98,6 +99,8 @@ const serverCleanup = () => {
         activeConnection.close();
     }
 
+
+    //TODO Shutdown database connection
     process.exit(0);
 };
 
@@ -108,7 +111,15 @@ process.on('SIGTERM', serverCleanup);
 
 
 const PORT = process.env.PORT || 3001;
-server.listen(PORT, () => {
-    console.log(`listening on port: ${PORT}`);
-})
+
+initializePostgres()
+    .then(() => {
+        server.listen(PORT, () => {
+            console.log(`listening on port: ${PORT}`);
+        })
+    }).catch((err) => {
+    console.error('Failed to initialize database:', err);
+    process.exit(1);
+});
+
 
