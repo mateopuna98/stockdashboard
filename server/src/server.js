@@ -67,8 +67,8 @@ class StockObservatoryServer {
             console.log("New client connected to WebSocket");
 
             webSocketManager.setConnection(ws);
-
             webSocketManager.sendMessage({userId: this.userId});
+
             const initialData = assembleWebsocketMsg(this.marketHighlightsCache, this.watchlistCache);
             webSocketManager.sendMessage(initialData);
 
@@ -76,17 +76,17 @@ class StockObservatoryServer {
                 await sendDashboardInfo(webSocketManager, this.marketHighlightsCache, this.watchlistCache);
             }, this.UPDATE_INTERVAL_MS);
 
-            webSocketManager.setInterval(interval);
+            webSocketManager.setInterval(ws, interval);
 
             ws.on("close", () => {
                 console.log("Client disconnected");
-                webSocketManager.cleanup();
+                webSocketManager.cleanup(ws);
             });
 
             ws.on("error", (error) => {
                 console.log("WebSocket error:", error.message);
                 if (ws.readyState === ws.CLOSED || ws.readyState === ws.CLOSING) {
-                    webSocketManager.cleanup();
+                    webSocketManager.cleanup(ws);
                 }
             });
         });

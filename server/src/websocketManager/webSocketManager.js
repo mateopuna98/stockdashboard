@@ -1,23 +1,27 @@
 class WebSocketManager {
     constructor () {
-        this.connections = new Set();
-        this.activeInterval = null;
+        this.connections = new Map();
     }
 
     setConnection(ws){
-        this.connections.add(ws);
+        this.connections.set(ws, null);
 
         ws.on('close', () => {
+
+            const interval = this.connections.get(ws);
+            if (interval) {
+                clearInterval(interval)
+            }
             this.connections.delete(ws);
         })
     }
 
-    setInterval(interval) {
-        this.activeInterval = interval;
+    setInterval(ws, interval) {
+        this.connections.set(ws,interval);
     }
     sendMessage(message) {
 
-        this.connections.forEach(ws => {
+        this.connections.forEach((interval, ws) => {
             try {
                 if (ws.readyState === 1) {
                     ws.send(JSON.stringify(message));
@@ -26,17 +30,20 @@ class WebSocketManager {
                 }
             } catch (e) {
                 console.error(`Error sending data: ${e.message}`);
+                if (interval) {
+                    clearInterval(interval);
+                }
+                this.connections.delete(ws);
             }
         })
-
     }
 
-    cleanup() {
-        if (this.activeInterval) {
-            clearInterval(this.activeInterval);
-            this.activeInterval = null;
+    cleanup(ws) {
+        const interval = this.connections.get(ws);
+        if (interval) {
+            clearInterval(interval);
         }
-        this.connections.clear();
+        this.connections.delete(ws);
     }
 }
 
