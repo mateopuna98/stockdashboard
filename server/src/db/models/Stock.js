@@ -10,6 +10,7 @@ const Stock = sequelize.define(
             primaryKey: true,
             allowNull: false,
             type: DataTypes.UUID,
+
         },
         "symbol": {
             type: DataTypes.STRING,
@@ -20,7 +21,26 @@ const Stock = sequelize.define(
             type: DataTypes.STRING,
             allowNull: false,
         },
+        "dummy_price": {
+            type: DataTypes.DECIMAL(10, 2),
+            defaultValue: 0,
+            allowNull: false,
+            get() {
+                const value = this.getDataValue('dummy_price');
+                return value === null ? null : Number(value);
+            }
+        },
+        "last_price": {
+            type: DataTypes.DECIMAL(10, 2),
+            defaultValue: 0,
+            allowNull: false,
+            get() {
+                const value = this.getDataValue('dummy_price');
+                return value === null ? null : Number(value);
+            }
+        }
     }
+
 );
 
 module.exports = Stock;

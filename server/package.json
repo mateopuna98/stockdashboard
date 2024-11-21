@@ -4,12 +4,13 @@
   "description": "Backend for Stock Dashboard project",
   "main": "src/server.js",
   "scripts": {
-    "docker": "node src/server.js",
+    "start": "node src/server.js",
     "dev": "nodemon src/server.js"
   },
   "author": "Mateo Puña",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.21.1",
     "nodemon": "^3.1.7",
     "pg": "^8.13.1",
@@ -17,5 +18,8 @@
     "sequelize": "^6.37.5",
     "uuid": "^11.0.3",
     "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "nodemon": "latest"
   }
 }

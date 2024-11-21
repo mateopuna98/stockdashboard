@@ -1,11 +1,11 @@
 const {DataTypes} = require("sequelize"),
     sequelize = require("../configPostgres"),
     uuid = require("uuid"),
-    Watchlist = require("./Watchlist"),
+    User = require("./User"),
     Stock = require("./Stock");
 
 const WatchlistItem = sequelize.define(
-    "Watchlist",
+    "WatchlistItem",
     {
         "id":{
             defaultValue: () => uuid.v4(),
@@ -13,7 +13,7 @@ const WatchlistItem = sequelize.define(
             allowNull: false,
             type: DataTypes.UUID,
         },
-        "watchlist_id": {
+        "user_id": {
             allowNull: false,
             type: DataTypes.UUID
         },
@@ -26,10 +26,19 @@ const WatchlistItem = sequelize.define(
             },
             onDelete: "CASCADE"
         }
+    }, {
+        indexes: [
+            {
+                unique: true,
+                fields: ["user_id", "stock_id"]
+            }
+        ]
     }
 );
 
-Watchlist.hasMany(WatchlistItem, {foreignKey: "watchlist_id", onDelete: "CASCADE"},);
-WatchlistItem.belongsTo(Watchlist);
+User.hasMany(WatchlistItem, {foreignKey: "user_id", onDelete: "CASCADE"});
+WatchlistItem.belongsTo(User);
+
+WatchlistItem.belongsTo(Stock, {foreignKey: "stock_id", onDelete: "CASCADE"});
 
 module.exports = WatchlistItem;

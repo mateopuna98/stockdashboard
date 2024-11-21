@@ -1,11 +1,9 @@
 FROM node:22-alpine
 
-WORKDIR ./server
-
+WORKDIR ./dashboard
 COPY package*.json ./
 COPY . .
 
 RUN npm install
 
-
-CMD ["npm", "run", "dev"]
+CMD ["npm", "start"]
