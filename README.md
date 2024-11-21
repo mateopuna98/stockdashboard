@@ -1,7 +1,6 @@
 # Real-Time Stock Dashboard
 
-Real-time stock market dashboard that displays stock prices and updates them periodically. The application is built with Node.js for the backend, a frontend with React.js, and it utilizes SQL for data management. 
-
+Real-time stock market dashboard that displays stock prices and updates them periodically. The application is built with Node.js for the backend, a frontend with React.js, and it utilizes SQL for data management.
 I am using this project to showcase my knowledge in full-stack development using the aforementioned stack.
 
 ## Setup
@@ -10,7 +9,8 @@ I am using this project to showcase my knowledge in full-stack development using
 
 To run the app, you must navigate to the main directory, `stockdashboard/`, and run `docker compose up`
 
-I recommend running the expanded version `docker compose up --build --force-recreate` if you'll run the app several times.
+I recommend running the expanded version `docker compose up --build --force-recreate` if you'll run the app several times,
+sometimes docker cleaning mechanism can accumulate cache that interferes with a new instance.
 
 That will start both the server and the client, which you can start using in `http://localhost:3000/`
 
@@ -22,7 +22,7 @@ To stop cleanly, use `docker compose down` from the same directory where you sta
 
 The project has two main components, dashboard (frontend) and server (backend).
 
-The dashboarh is built with the Create React App framework.
+The dashboard is built with the Create React App framework.
 
 The server is an expressJS server that has some routing endpoints and also manages a websocket connection with the client. 
 
